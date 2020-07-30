@@ -12,3 +12,9 @@ $ make up
 ```
 $ make down
 ```
+
+## Usage
+dockerを起動している状態で下記コマンドを入力
+```
+$ curl -s http://0.0.0.0:8000/api | jq .
+```
