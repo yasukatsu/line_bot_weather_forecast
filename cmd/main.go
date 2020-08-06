@@ -16,6 +16,8 @@ func main() {
 	fmt.Printf("%v\n", "start")
 	r := mux.NewRouter()
 	r.HandleFunc("/api", handler.OpenWhetherMap)
+	r.HandleFunc("/api2", handler.NowTemp)
 
 	log.Fatal(http.ListenAndServe(":8000", handlers.CORS()(r)))
+
 }
