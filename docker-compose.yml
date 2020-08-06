@@ -8,7 +8,7 @@ services:
       - config/.env.local
     ports:
       - "8000:8000"
-    working_dir: /go/src/line_bot_weather_forecast
+    working_dir: /go/src/y_ara/line_bot_weather_forecast
     volumes:
-      - .:/go/src/line_bot_weather_forecast
+      - .:/go/src/y_ara/line_bot_weather_forecast
     command: go run cmd/main.go

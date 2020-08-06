@@ -2,51 +2,20 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+
+	"y_ara/line_bot_weather_forecast/handler"
 )
 
 func main() {
 
 	fmt.Printf("%v\n", "start")
 	r := mux.NewRouter()
-	r.HandleFunc("/api", openWhetherMap)
+	r.HandleFunc("/api", handler.OpenWhetherMap)
 
 	log.Fatal(http.ListenAndServe(":8000", handlers.CORS()(r)))
-}
-
-func openWhetherMap(w http.ResponseWriter, r *http.Request) {
-
-	url := "https://community-open-weather-map.p.rapidapi.com/weather?q=Tokyo,jp"
-
-	res, err := openWhetherMapResponse(url)
-	if err != nil {
-		return
-	}
-
-	w.Write(res)
-}
-
-func openWhetherMapResponse(url string) ([]byte, error) {
-
-	req, _ := http.NewRequest("GET", url, nil)
-
-	req.Header.Add("x-rapidapi-host", os.Getenv("X_RAPIDAPI_HOST"))
-	req.Header.Add("x-rapidapi-key", os.Getenv("X_RAPIDAPI_KEY"))
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	defer res.Body.Close()
-	body, _ := ioutil.ReadAll(res.Body)
-
-	return body, nil
 }
