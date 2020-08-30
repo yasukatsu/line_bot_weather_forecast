@@ -52,10 +52,10 @@ type StructOpenWhetherMap struct {
 	Cod      int    `json:"cod"`
 }
 
+var url = "https://community-open-weather-map.p.rapidapi.com/weather?q=Tokyo,jp"
+
 // OpenWhetherMap ...
 func OpenWhetherMap(w http.ResponseWriter, r *http.Request) {
-
-	url := "https://community-open-weather-map.p.rapidapi.com/weather?q=Tokyo,jp"
 
 	res, err := openWhetherMapResponse(url)
 	if err != nil {
@@ -64,6 +64,50 @@ func OpenWhetherMap(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(res)
+}
+
+// NowTemp ...
+func NowTemp(w http.ResponseWriter, r *http.Request) {
+
+	result := nowTemp()
+	if result == "" {
+		w.Write([]byte("エラーだお"))
+		return
+	}
+
+	w.Write([]byte(result))
+}
+
+func nowTemp() string {
+	res, err := openWhetherMapResponse(url)
+	if err != nil {
+		log.Fatal(err)
+		return ""
+	}
+
+	s := convertToStruct(res)
+	if s == nil {
+		log.Fatalf("fatal convertToStruct")
+		return ""
+	}
+
+	// ケルビン(K) から摂氏(℃) に変換するに、-273.15 をする。
+	temp := s.Main.Temp - float64(273.15)
+	v := fmt.Sprintf("今の東京の温度は%v度です。\n", int(temp))
+
+	return v
+}
+
+func convertToStruct(value []byte) *StructOpenWhetherMap {
+	s := new(StructOpenWhetherMap)
+
+	err := json.Unmarshal(value, s)
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+
+	return s
 }
 
 func openWhetherMapResponse(url string) ([]byte, error) {
@@ -83,32 +127,4 @@ func openWhetherMapResponse(url string) ([]byte, error) {
 	body, _ := ioutil.ReadAll(res.Body)
 
 	return body, nil
-}
-
-// NowTemp ...
-func NowTemp(w http.ResponseWriter, r *http.Request) {
-	url := "https://community-open-weather-map.p.rapidapi.com/weather?q=Tokyo,jp"
-
-	res, err := openWhetherMapResponse(url)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-
-	fmt.Printf("resByte: %v\n", string(res))
-
-	s := new(StructOpenWhetherMap)
-	err = json.Unmarshal(res, s)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-
-	// この値はケルビン(K) で表されている。
-	// ケルビン(K) から摂氏(℃) に変換するには、-273.15 を計算します。
-	v := s.Main.Temp - float64(273.15)
-
-	temp := fmt.Sprintf("今の東京の温度は%v度です。\n", int(v))
-
-	w.Write([]byte(temp))
 }
