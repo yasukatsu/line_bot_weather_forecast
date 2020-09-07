@@ -9,6 +9,8 @@ import (
 	"os"
 )
 
+var url = "https://community-open-weather-map.p.rapidapi.com/weather?q=Tokyo,jp"
+
 // StructOpenWhetherMap ...
 type StructOpenWhetherMap struct {
 	Coord struct {
@@ -52,7 +54,10 @@ type StructOpenWhetherMap struct {
 	Cod      int    `json:"cod"`
 }
 
-var url = "https://community-open-weather-map.p.rapidapi.com/weather?q=Tokyo,jp"
+// Now ...
+type Now struct {
+	Temp float64
+}
 
 // OpenWhetherMap ...
 func OpenWhetherMap(w http.ResponseWriter, r *http.Request) {
@@ -93,6 +98,10 @@ func nowTemp() string {
 
 	// ケルビン(K) から摂氏(℃) に変換するに、-273.15 をする。
 	temp := s.Main.Temp - float64(273.15)
+
+	now := new(Now)
+	now.Temp = temp
+
 	v := fmt.Sprintf("今の東京の温度は%v度です。\n", int(temp))
 
 	return v
