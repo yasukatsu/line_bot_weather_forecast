@@ -41,8 +41,15 @@ func lineBot() {
 		fmt.Printf("v: %v\n", v)
 
 		for _, event := range events {
-			if event.Type == linebot.EventTypeMessage {
-				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(v)).Do(); err != nil {
+			if event.Type != linebot.EventTypeMessage {
+				log.Printf("mismatch: event.Type: %v linebot.EventTypeMessage: %v\n", event.Type, linebot.EventTypeMessage)
+				return
+			}
+
+			switch message := event.Message.(type) {
+			case *linebot.TextMessage:
+				log.Printf("success [message: %v, v: %v\n", message, v)
+				if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(v)).Do(); err != nil {
 					log.Print(err)
 				}
 			}
