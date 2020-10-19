@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"y_ara/line_bot_weather_forecast/handler"
 
 	"github.com/gorilla/handlers"
@@ -18,6 +19,12 @@ func main() {
 	r.HandleFunc("/api2", handler.NowTemp)
 	r.HandleFunc("/nowtemp", handler.LineBot)
 
-	log.Fatal(http.ListenAndServe(":8000", handlers.CORS()(r)))
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal(http.ListenAndServe(":8000", handlers.CORS()(r)))
+		return
+	}
+
+	log.Fatal(http.ListenAndServe(":"+port, handlers.CORS()(r)))
 
 }
