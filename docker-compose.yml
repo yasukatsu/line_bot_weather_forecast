@@ -3,7 +3,7 @@ services:
   app:
     container_name: app
     build: ./build/golang
-    tty: true
+    # tty: true
     env_file:
       - config/.env.local
     ports:
@@ -11,4 +11,5 @@ services:
     working_dir: /go/src/y_ara/line_bot_weather_forecast
     volumes:
       - .:/go/src/y_ara/line_bot_weather_forecast
-    command: go run cmd/main.go
+    # command: go -i run cmd/main.go
+    command: gin -b weather-bot -p 8000 -i run main.go
