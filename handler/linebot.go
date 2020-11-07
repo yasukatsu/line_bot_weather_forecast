@@ -12,15 +12,7 @@ import (
 
 // LineBot ...
 func LineBot(w http.ResponseWriter, r *http.Request) {
-
-	NowTemp(w, r)
-
-	lineBot()
-	fmt.Printf("%v\n", "#####")
-}
-
-func lineBot() {
-	fmt.Printf("%v\n", "$$$$$")
+	// lineBot(temp)
 	handler, err := httphandler.New(
 		os.Getenv("CHANNEL_SECRET"),
 		os.Getenv("CHANNEL_TOKEN"),
@@ -37,12 +29,7 @@ func lineBot() {
 			return
 		}
 
-		now := new(Now)
-		v := fmt.Sprintf("今の東京の温度は%v度です。\n", int(now.Temp))
-		fmt.Printf("v: %v\n", v)
-
 		for _, event := range events {
-			fmt.Printf("%v\n", "#####")
 			if event.Type != linebot.EventTypeMessage {
 				log.Printf("mismatch: event.Type: %v linebot.EventTypeMessage: %v\n", event.Type, linebot.EventTypeMessage)
 				return
@@ -50,7 +37,7 @@ func lineBot() {
 
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage:
-				fmt.Printf("%v\n", "#####")
+				v := fmt.Sprintf("今の東京の温度は%v度です。\n", GetTemp())
 				log.Printf("success [message: %v, v: %v\n", message, v)
 				if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(v)).Do(); err != nil {
 					log.Print(err)
@@ -58,4 +45,5 @@ func lineBot() {
 			}
 		}
 	})
+	http.Handle("/nowtemp", handler)
 }

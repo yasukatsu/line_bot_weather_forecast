@@ -9,8 +9,6 @@ import (
 	"os"
 )
 
-var url = "https://community-open-weather-map.p.rapidapi.com/weather?q=Tokyo,jp"
-
 // StructOpenWhetherMap ...
 type StructOpenWhetherMap struct {
 	Coord struct {
@@ -62,7 +60,7 @@ type Now struct {
 // OpenWhetherMap ...
 func OpenWhetherMap(w http.ResponseWriter, r *http.Request) {
 
-	res, err := openWhetherMapResponse(url)
+	res, err := openWhetherMapResponse()
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -83,8 +81,33 @@ func NowTemp(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(result))
 }
 
+// GetTemp ...
+func GetTemp() string {
+	res, err := openWhetherMapResponse()
+	if err != nil {
+		log.Fatal(err)
+		return ""
+	}
+
+	s := convertToStruct(res)
+	if s == nil {
+		log.Fatalf("fatal convertToStruct")
+		return ""
+	}
+
+	// ケルビン(K) から摂氏(℃) に変換するに、-273.15 をする。
+	temp := s.Main.Temp - float64(273.15)
+
+	now := new(Now)
+	now.Temp = temp
+
+	v := fmt.Sprintf("今の東京の温度は%v度です。\n", int(temp))
+
+	return v
+}
+
 func nowTemp() string {
-	res, err := openWhetherMapResponse(url)
+	res, err := openWhetherMapResponse()
 	if err != nil {
 		log.Fatal(err)
 		return ""
@@ -119,7 +142,8 @@ func convertToStruct(value []byte) *StructOpenWhetherMap {
 	return s
 }
 
-func openWhetherMapResponse(url string) ([]byte, error) {
+func openWhetherMapResponse() ([]byte, error) {
+	url := "https://community-open-weather-map.p.rapidapi.com/weather?q=Tokyo,jp"
 
 	req, _ := http.NewRequest("GET", url, nil)
 
