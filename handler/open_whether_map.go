@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 // StructOpenWhetherMap ...
@@ -101,7 +102,7 @@ func GetTemp() string {
 	now := new(Now)
 	now.Temp = temp
 
-	v := fmt.Sprintf("今の東京の温度は%v度です。\n", int(temp))
+	v := fmt.Sprintf(strconv.FormatFloat(temp, 'f', 1, 64))
 
 	return v
 }
