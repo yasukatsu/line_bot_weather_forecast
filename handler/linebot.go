@@ -31,11 +31,15 @@ func LineBot(w http.ResponseWriter, r *http.Request) {
 
 		switch message := event.Message.(type) {
 		case *linebot.TextMessage:
-			v := fmt.Sprintf("今の東京の温度は%v度です。\n", GetTemp())
-			log.Printf("success [message: %v], send: %v\n", message, v)
-			if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(v)).Do(); err != nil {
-				log.Fatalf("%+v", err)
-			}
+			returnTemp(bot, event, message)
 		}
+	}
+}
+
+func returnTemp(bot *linebot.Client, event *linebot.Event, message linebot.Message) {
+	v := fmt.Sprintf("今の東京の温度は%v度です。\n", GetTemp())
+	log.Printf("success [message: %v], send: %v\n", message, v)
+	if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(v)).Do(); err != nil {
+		log.Fatalf("%+v", err)
 	}
 }
