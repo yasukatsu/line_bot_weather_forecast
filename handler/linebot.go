@@ -29,10 +29,14 @@ func LineBot(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		switch message := event.Message.(type) {
-		case *linebot.TextMessage:
-			returnTemp(bot, event, message)
+		if event.Type == linebot.EventTypeMessage {
+			returnQuickReply(bot, event)
 		}
+		// switch message := event.Message.(type) {
+		// case *linebot.TextMessage:
+		// 	// returnTemp(bot, event, message)
+		// 	returnQuickReply(bot, event)
+		// }
 	}
 }
 
@@ -41,5 +45,39 @@ func returnTemp(bot *linebot.Client, event *linebot.Event, message linebot.Messa
 	log.Printf("success [message: %v], send: %v\n", message, v)
 	if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(v)).Do(); err != nil {
 		log.Fatalf("%+v", err)
+	}
+}
+
+func returnQuickReply(bot *linebot.Client, event *linebot.Event) {
+
+	var messages []linebot.SendingMessage
+
+	leftBtn := linebot.NewMessageAction("left", "left clicked")
+	rightBtn := linebot.NewMessageAction("right", "right clicked")
+
+	template := linebot.NewConfirmTemplate("Hello World", leftBtn, rightBtn)
+
+	message := linebot.NewTemplateMessage("Sorry :(, please update your app.", template)
+
+	messages = append(messages, message)
+
+	// message := linebot.NewTextMessage("一覧から選んでね").WithQuickReplies(
+	// 	linebot.NewQuickReplyItems(
+	// 		linebot.NewQuickReplyButton("", linebot.NewMessageAction("ラベル", "テキスト").QuickReplyAction()),
+	// 	),
+	// )
+	// if err != nil {
+	// 	log.Fatalf("%+v", err)
+	// }
+
+	if _, err := bot.ReplyMessage(event.ReplyToken, messages...).Do(); err != nil {
+		log.Fatalf("%+v", err)
+	}
+}
+
+func insertQuickReplyAction() linebot.MessageAction {
+	return linebot.MessageAction{
+		Label: "スプラッシュボム",
+		Text:  "スプラッシュボム",
 	}
 }
