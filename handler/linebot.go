@@ -48,19 +48,30 @@ func returnTemp(bot *linebot.Client, event *linebot.Event, message linebot.Messa
 	}
 }
 
+func returnTemplate(bot *linebot.Client, event *linebot.Event) {
+	var messages []linebot.SendingMessage
+
+	leftBtn := linebot.NewMessageAction("left", "left clicked")
+	rightBtn := linebot.NewMessageAction("right", "right clicked")
+	template := linebot.NewConfirmTemplate("Hello World", leftBtn, rightBtn)
+	message := linebot.NewTemplateMessage("Sorry :(, please update your app.", template)
+
+	messages = append(messages, message)
+
+	if _, err := bot.ReplyMessage(event.ReplyToken, messages...).Do(); err != nil {
+		log.Fatalf("%+v", err)
+	}
+}
+
 func returnQuickReply(bot *linebot.Client, event *linebot.Event) {
 
 	var messages []linebot.SendingMessage
 
-	// leftBtn := linebot.NewMessageAction("left", "left clicked")
-	// rightBtn := linebot.NewMessageAction("right", "right clicked")
-	// template := linebot.NewConfirmTemplate("Hello World", leftBtn, rightBtn)
-	// message := linebot.NewTemplateMessage("Sorry :(, please update your app.", template)
-
 	message := linebot.NewTextMessage("一覧から選んでね").WithQuickReplies(
 		linebot.NewQuickReplyItems(
-			linebot.NewQuickReplyButton("", linebot.NewMessageAction("スプラッシュボム", "ジョナサン")),
-			linebot.NewQuickReplyButton("", linebot.NewMessageAction("ライトニングフィスト", "ボブ")),
+			linebot.NewQuickReplyButton("", linebot.NewMessageAction("メッセージアクション", "Done!!!")),
+			linebot.NewQuickReplyButton("", linebot.NewLocationAction("位置情報アクション")),
+			linebot.NewQuickReplyButton("", linebot.NewMessageAction("URIアクション", "https://www.google.com/?hl=ja")),
 		),
 	)
 
